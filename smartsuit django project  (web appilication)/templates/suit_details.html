@@ -1,0 +1,28 @@
+{% for suit in available_suit %}
+    <tr>
+        <th scope="row">{{ suit.suit_id }}</th>
+        <td>{{ suit.allocate_to }}</td>
+        <td>{{ suit.div }}</td>
+        <td>
+            <a href="{% url 'update_suit' suit.suit_id %}" class="btn btn-primary">Update</a>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete_modal{{ suit.suit_id }}">Delete</button>
+            <div class="modal fade" id="delete_modal{{ suit.suit_id }}" tabindex="-1" aria-labelledby="delete_modal_label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="delete_modal_label">Delete Suit</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Do you want to delete this suit - {{ suit.suit_id }}?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger" onclick="delete_suit({{ suit.suit_id }})">Yes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+{% endfor %}

@@ -1,0 +1,56 @@
+{% for employee in employees %}
+    {% for suit in suits %}
+        {% if employee.emp_id == suit.suit_id.suit_id %}
+            <tr>
+                <td>{{ employee.emp_id }} - {{ suit.suit_id.suit_id }}</td>
+                <td>{{ employee.name }}</td>
+
+                {% if suit.temperature > 39 %}
+                    <td class="bg-danger">{{ suit.temperature }}</td>
+                {% else %}
+                    <td>{{ suit.temperature }}</td>
+                {% endif %}
+
+                {% if suit.pressure > 115 %}
+                    <td class="bg-danger">{{ suit.pressure }}</td>
+                {% else %}
+                    <td>{{ suit.pressure }}</td>
+                {% endif %}
+
+                {% if suit.Methane > 550 %}
+                    <td class="bg-danger">{{ suit.Methane }}</td>
+                {% else %}
+                    <td>{{ suit.Methane }}</td>
+                {% endif %}
+
+
+                {% if suit.co > 550 %}
+                    <td class="bg-danger">{{ suit.co }}</td>
+                {% else %}
+                    <td>{{ suit.co }}</td>
+                {% endif %}
+
+
+                {% if suit.heart_rate > 110 %}
+                    <td class="bg-danger">{{ suit.heart_rate }}</td>
+                {% elif suit.heart_rate > 60 and suit.heart_rate <= 100 %}
+                    <td>{{ suit.heart_rate }}</td>
+                {% else %}
+                    <td style="background-color: #fd7e14">{{ suit.heart_rate }}</td>
+                {% endif %}
+
+
+                {% if suit.oxygen > 130 %}
+                    <td class="bg-danger">{{ suit.oxygen }}</td>
+                {% elif suit.oxygen > 101 and suit.oxygen < 109 %}
+                    <td class="bg-warning">{{ suit.oxygen }}</td>
+                {% elif suit.oxygen > 110 and suit.oxygen < 130 %}
+                    <td style="background-color: #fd7e14">{{ suit.oxygen }}</td>
+                {% else %}
+                    <td>{{ suit.oxygen }}</td>
+                {% endif %}
+
+            </tr>
+        {% endif %}
+    {% endfor %}
+{% endfor %}

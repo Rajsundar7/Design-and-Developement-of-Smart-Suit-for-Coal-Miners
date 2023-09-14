@@ -1,0 +1,203 @@
+{% load crispy_forms_tags %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Employees Security Management</title>
+</head>
+<body>{% csrf_token %}
+<section class="mb-2">
+    <div class="row text-center">
+        <h1>Suit Management</h1>
+    </div>
+    <div class="row text-center mt-2">
+        <div class="col">
+            <a class="btn btn-primary" href="{% url 'employees' %}">Employee <i class="fa fa-arrow-right" aria-hidden="true"></i> </a>
+        </div>
+        <div class="col">
+            <a class="btn btn-primary" href="{% url 'dashboard' %}">Dashboard <i class="fa fa-arrow-right" aria-hidden="true"></i> </a>
+        </div>
+        <div class="col">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#allocate_suit">Allocate Suit <i class="fa fa-plus" aria-hidden="true"></i> </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_suit">Add Suit <i class="fa fa-plus" aria-hidden="true"></i> </button>
+        </div>
+    </div>
+</section>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Suit ID</th>
+        <th scope="col">Allocated to</th>
+        <th scope="col">Division</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody id="suit_details_table">
+    {% include 'suit_details.html' %}
+    </tbody>
+</table>
+</section>
+
+
+<div class="modal fade" id="allocate_suit" tabindex="-1" aria-labelledby="allocate_suit_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="allocate_suit_label">Allocate Suit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="allocate_suit_form" method="POST" autocomplete="off" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="row">
+                            {% for field in allocate_suit %}
+                                <div class="col-md-12">
+                                    {{ field |as_crispy_field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Allocate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="add_suit" tabindex="-1" aria-labelledby="add_suit_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_suit_label">Add Suit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="add_suit_form" method="POST" autocomplete="off" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="row">
+                            {% for field in suit_add_form %}
+                                <div class="col-md-12">
+                                    {{ field |as_crispy_field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.26/dist/sweetalert2.all.min.js"></script>
+
+<script>
+    $(document).on('submit','#add_suit_form',function(e) {
+        $('#add_suit').modal('hide');
+        e.preventDefault();
+        const suit_form = $(this).serialize();
+        $.ajax({
+            type: 'POST',
+            url: '/add_suit/',
+            data: suit_form,
+            success: function (response) {
+                $("#add_suit_form")[0].reset();
+                if (response['suit_exist'] === true){
+                    $('#suit_details_table').html(response.html);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Suit details added.',
+                    })
+                }
+                if (response['suit_exist'] === false){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Suit already added.',
+                    })
+                }
+            },
+            error : function() {
+                $("#add_suit_form")[0].reset();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'There is some error in Suit Form.',
+                })
+            }
+        });
+    });
+
+
+    $(document).on('submit','#allocate_suit_form',function(e) {
+        $('#allocate_suit').modal('hide');
+        e.preventDefault();
+        const allocate_suit_form = $(this).serialize();
+        console.log(allocate_suit_form);
+        $.ajax({
+            type: 'POST',
+            url: '/allocate_suit/',
+            data: allocate_suit_form,
+            success: function (response) {
+                $("#allocate_suit_form")[0].reset();
+                if (response['reason'] === true){
+                    $('#suit_details_table').html(response.html);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Suit Allocated to '+ response['emp'],
+                    });
+                }
+            },
+            error : function() {
+                $("#allocate_suit_form")[0].reset();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'There is some error in Suit Form.',
+                })
+            }
+        });
+    });
+
+
+    function delete_suit(id){
+        const csrftoken = $('[name=csrfmiddlewaretoken]').val();
+        $.ajax({
+            type : 'POST',
+            url : '/delete_suit/',
+            data: {'id':id, 'csrfmiddlewaretoken':csrftoken},
+            success : function(response) {
+                const delete_suit_modal = "#delete_modal" + id;
+                $(delete_suit_modal).modal('hide');
+                if(response["success"] === true){
+                    $('#suit_details_table').html(response.html);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Suit Deleted!',
+                        text: 'Suit deleted successfully.',
+                    })
+                }
+            },
+            error : function() {
+
+            },
+        });
+    }
+</script>
+
+</body>
+</html>
